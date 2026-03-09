@@ -1,0 +1,328 @@
+{
+  "type": "page",
+  "title": "📢 消息推送管理",
+  "remark": "通过企业微信向供应商/商家批量发送通知消息",
+  "toolbar": [
+    {
+      "type": "button",
+      "label": "➕ 创建推送任务",
+      "level": "primary",
+      "actionType": "link",
+      "link": "/create"
+    }
+  ],
+  "body": [
+    {
+      "type": "grid",
+      "columns": [
+        {
+          "type": "card",
+          "className": "bg-blue-50 p-4",
+          "body": [
+            {
+              "type": "tpl",
+              "tpl": "<div style=\"font-size:14px;color:#8c8c8c;margin-bottom:8px;\">📊 今日推送次数</div>"
+            },
+            {
+              "type": "tpl",
+              "tpl": "<div style=\"font-size:32px;font-weight:700;color:#1890ff;\">12</div>"
+            },
+            {
+              "type": "tpl",
+              "tpl": "<div style=\"font-size:12px;color:#52c41a;margin-top:8px;\">↑ 15% 较昨日</div>"
+            }
+          ]
+        },
+        {
+          "type": "card",
+          "className": "bg-green-50 p-4",
+          "body": [
+            {
+              "type": "tpl",
+              "tpl": "<div style=\"font-size:14px;color:#8c8c8c;margin-bottom:8px;\">✅ 成功送达</div>"
+            },
+            {
+              "type": "tpl",
+              "tpl": "<div style=\"font-size:32px;font-weight:700;color:#52c41a;\">1,842</div>"
+            },
+            {
+              "type": "tpl",
+              "tpl": "<div style=\"font-size:12px;color:#52c41a;margin-top:8px;\">↑ 98.2% 成功率</div>"
+            }
+          ]
+        },
+        {
+          "type": "card",
+          "className": "bg-orange-50 p-4",
+          "body": [
+            {
+              "type": "tpl",
+              "tpl": "<div style=\"font-size:14px;color:#8c8c8c;margin-bottom:8px;\">🏪 覆盖商家</div>"
+            },
+            {
+              "type": "tpl",
+              "tpl": "<div style=\"font-size:32px;font-weight:700;color:#fa8c16;\">156</div>"
+            },
+            {
+              "type": "tpl",
+              "tpl": "<div style=\"font-size:12px;color:#8c8c8c;margin-top:8px;\">总计 160 家</div>"
+            }
+          ]
+        },
+        {
+          "type": "card",
+          "className": "bg-red-50 p-4",
+          "body": [
+            {
+              "type": "tpl",
+              "tpl": "<div style=\"font-size:14px;color:#8c8c8c;margin-bottom:8px;\">⚠️ 推送失败</div>"
+            },
+            {
+              "type": "tpl",
+              "tpl": "<div style=\"font-size:32px;font-weight:700;color:#ff4d4f;\">3</div>"
+            },
+            {
+              "type": "tpl",
+              "tpl": "<div style=\"font-size:12px;color:#ff4d4f;margin-top:8px;\">↓ 需关注</div>"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "crud",
+      "name": "sample",
+      "api": "get:/api/push-records",
+      "filter": {
+        "type": "form",
+        "mode": "inline",
+        "wrapWithPanel": false,
+        "body": [
+          {
+            "type": "input-text",
+            "name": "keywords",
+            "placeholder": "搜索推送 ID/消息标题",
+            "clearable": true,
+            "addOn": {
+              "type": "submit",
+              "label": "搜索",
+              "level": "primary"
+            }
+          },
+          {
+            "type": "select",
+            "name": "msgType",
+            "placeholder": "消息类型",
+            "clearable": true,
+            "options": [
+              { "label": "系统通知", "value": "system" },
+              { "label": "关店通知", "value": "close" },
+              { "label": "注销通知", "value": "cancel" },
+              { "label": "清退通知", "value": "remove" },
+              { "label": "营销活动", "value": "marketing" }
+            ]
+          },
+          {
+            "type": "select",
+            "name": "status",
+            "placeholder": "发送状态",
+            "clearable": true,
+            "options": [
+              { "label": "发送成功", "value": "success" },
+              { "label": "发送中", "value": "sending" },
+              { "label": "部分失败", "value": "partial_failed" },
+              { "label": "发送失败", "value": "failed" }
+            ]
+          },
+          {
+            "type": "input-date-range",
+            "name": "dateRange",
+            "placeholder": "推送时间范围"
+          }
+        ]
+      },
+      "headerToolbar": [
+        "bulkActions",
+        {
+          "type": "exportExcel",
+          "label": "导出数据"
+        }
+      ],
+      "columns": [
+        {
+          "type": "checkbox",
+          "name": "id",
+          "fixed": "left"
+        },
+        {
+          "name": "id",
+          "label": "推送 ID",
+          "width": 180,
+          "fixed": "left"
+        },
+        {
+          "name": "title",
+          "label": "消息标题",
+          "type": "tpl",
+          "tpl": "${title}",
+          "toggled": true
+        },
+        {
+          "name": "msgType",
+          "label": "消息类型",
+          "type": "mapping",
+          "map": {
+            "system": "<span class='label label-info'>系统通知</span>",
+            "close": "<span class='label label-warning'>关店通知</span>",
+            "cancel": "<span class='label label-purple'>注销通知</span>",
+            "remove": "<span class='label label-danger'>清退通知</span>",
+            "marketing": "<span class='label label-success'>营销活动</span>"
+          }
+        },
+        {
+          "name": "receiverCount",
+          "label": "接收方",
+          "type": "tpl",
+          "tpl": "${receiverCount}家商家"
+        },
+        {
+          "name": "sendTime",
+          "label": "发送时间",
+          "type": "date",
+          "format": "YYYY-MM-DD HH:mm"
+        },
+        {
+          "name": "status",
+          "label": "状态",
+          "type": "mapping",
+          "map": {
+            "success": "<span class='label label-success'>✓ 发送成功</span>",
+            "sending": "<span class='label label-info'>⏳ 发送中</span>",
+            "partial_failed": "<span class='label label-warning'>✗ 部分失败</span>",
+            "failed": "<span class='label label-danger'>✗ 发送失败</span>"
+          }
+        },
+        {
+          "type": "operation",
+          "label": "操作",
+          "width": 150,
+          "buttons": [
+            {
+              "type": "button",
+              "label": "详情",
+              "level": "link",
+              "actionType": "drawer",
+              "drawer": {
+                "title": "推送详情 - ${id}",
+                "body": {
+                  "type": "form",
+                  "api": "get:/api/push-records/${id}",
+                  "body": [
+                    {
+                      "type": "input-text",
+                      "name": "id",
+                      "label": "推送 ID",
+                      "readOnly": true
+                    },
+                    {
+                      "type": "input-text",
+                      "name": "title",
+                      "label": "消息标题",
+                      "readOnly": true
+                    },
+                    {
+                      "type": "select",
+                      "name": "msgType",
+                      "label": "消息类型",
+                      "readOnly": true,
+                      "options": [
+                        { "label": "系统通知", "value": "system" },
+                        { "label": "关店通知", "value": "close" },
+                        { "label": "注销通知", "value": "cancel" },
+                        { "label": "清退通知", "value": "remove" },
+                        { "label": "营销活动", "value": "marketing" }
+                      ]
+                    },
+                    {
+                      "type": "textarea",
+                      "name": "content",
+                      "label": "消息内容",
+                      "readOnly": true,
+                      "rows": 6
+                    },
+                    {
+                      "type": "input-text",
+                      "name": "receiverCount",
+                      "label": "接收方数量",
+                      "readOnly": true
+                    },
+                    {
+                      "type": "input-text",
+                      "name": "successCount",
+                      "label": "成功数量",
+                      "readOnly": true
+                    },
+                    {
+                      "type": "input-text",
+                      "name": "failCount",
+                      "label": "失败数量",
+                      "readOnly": true
+                    },
+                    {
+                      "type": "input-text",
+                      "name": "sendTime",
+                      "label": "发送时间",
+                      "readOnly": true
+                    },
+                    {
+                      "type": "textarea",
+                      "name": "failReason",
+                      "label": "失败原因",
+                      "readOnly": true,
+                      "visibleOn": "data.failCount > 0"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "button",
+              "label": "重试",
+              "level": "danger",
+              "visibleOn": "data.status === 'failed' || data.status === 'partial_failed'",
+              "actionType": "ajax",
+              "api": "post:/api/push-records/${id}/retry",
+              "confirmText": "确定要重新发送这条消息吗？"
+            },
+            {
+              "type": "button",
+              "label": "删除",
+              "level": "link",
+              "actionType": "ajax",
+              "api": "delete:/api/push-records/${id}",
+              "confirmText": "确定要删除这条推送记录吗？"
+            }
+          ]
+        }
+      ],
+      "bulkActions": [
+        {
+          "label": "批量删除",
+          "type": "button",
+          "level": "danger",
+          "actionType": "ajax",
+          "api": "delete:/api/push-records",
+          "confirmText": "确定要批量删除选中的推送记录吗？"
+        }
+      ],
+      "perPage": 20,
+      "affixHeader": true,
+      "columnsTogglable": "auto",
+      "placeholder": "暂无数据",
+      "tableClassName": "table-db",
+      "headerClassName": "crud-table-header",
+      "footerClassName": "crud-table-footer",
+      "toolbarClassName": "crud-table-toolbar"
+    }
+  ]
+}

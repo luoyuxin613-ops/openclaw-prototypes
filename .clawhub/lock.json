@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "skills": {
+    "sonoscli": {
+      "version": "1.0.0",
+      "installedAt": 1772956022302
+    },
+    "tavily-search": {
+      "version": "1.0.0",
+      "installedAt": 1772956692563
+    },
+    "ui-ux-pro-max": {
+      "version": "0.1.0",
+      "installedAt": 1772956864094
+    },
+    "skill-vetter": {
+      "version": "1.0.0",
+      "installedAt": 1772957173643
+    },
+    "find-skills": {
+      "version": "0.1.0",
+      "installedAt": 1772957249013
+    },
+    "gog": {
+      "version": "1.0.0",
+      "installedAt": 1772957297349
+    },
+    "github": {
+      "version": "1.0.0",
+      "installedAt": 1772957339030
+    },
+    "capability-evolver": {
+      "version": "1.27.3",
+      "installedAt": 1772957351746
+    },
+    "diagram-generator": {
+      "version": "1.1.1",
+      "installedAt": 1772957374984
+    },
+    "agent-browser": {
+      "version": "0.2.0",
+      "installedAt": 1772957625972
+    },
+    "proactive-agent": {
+      "version": "3.1.0",
+      "installedAt": 1772957638645
+    },
+    "skill-creator": {
+      "version": "0.1.0",
+      "installedAt": 1772958041230
+    },
+    "using-superpowers": {
+      "version": "0.1.0",
+      "installedAt": 1772958453073
+    },
+    "subagent-driven-development": {
+      "version": "0.1.0",
+      "installedAt": 1772958547378
+    },
+    "brainstorming": {
+      "version": "0.1.0",
+      "installedAt": 1772958568929
+    },
+    "copywriting": {
+      "version": "0.1.0",
+      "installedAt": 1772958581528
+    },
+    "writing-plans": {
+      "version": "0.1.0",
+      "installedAt": 1772958617632
+    },
+    "content-strategy": {
+      "version": "0.1.0",
+      "installedAt": 1772958626383
+    },
+    "pdf": {
+      "version": "0.1.0",
+      "installedAt": 1772958685066
+    },
+    "markdown-converter": {
+      "version": "1.0.0",
+      "installedAt": 1772958745470
+    },
+    "marketing-mode": {
+      "version": "1.0.0",
+      "installedAt": 1772959083927
+    },
+    "executing-plans": {
+      "version": "0.1.0",
+      "installedAt": 1772959106036
+    },
+    "reflection": {
+      "version": "1.1.0",
+      "installedAt": 1772959135024
+    },
+    "superdesign": {
+      "version": "1.0.0",
+      "installedAt": 1772959257084
+    },
+    "browser-use": {
+      "version": "1.0.2",
+      "installedAt": 1772959370549
+    },
+    "vercel-react-native-skills": {
+      "version": "1.0.0",
+      "installedAt": 1772959451922
+    },
+    "product-marketing-context": {
+      "version": "1.0.0",
+      "installedAt": 1772959670766
+    },
+    "sem": {
+      "version": "1.0.0",
+      "installedAt": 1772959811265
+    },
+    "pricing": {
+      "version": "1.0.0",
+      "installedAt": 1772959831653
+    },
+    "apple-notes": {
+      "version": "1.0.0",
+      "installedAt": 1772964346121
+    },
+    "healthcheck": {
+      "version": "1.0.2",
+      "installedAt": 1772964898679
+    },
+    "nano-pdf": {
+      "version": "1.0.0",
+      "installedAt": 1772964922083
+    }
+  }
+}

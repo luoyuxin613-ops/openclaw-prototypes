@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天工系统 - 消息推送管理</title>
+    <link rel="stylesheet" href="https://aisuda.bce.baidu.com/amis/1.10.3/sdk/sdk.css">
+    <script src="https://aisuda.bce.baidu.com/amis/1.10.3/sdk/sdk.js"></script>
+    <style>
+        html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        #root { height: 100%; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script>
+    window.addEventListener('DOMContentLoaded', function() {
+        var amis = amisRequire('amis/embed');
+        var app = {
+            type: 'app',
+            brandName: '🐦 天工系统',
+            logo: '⚙️',
+            header: {
+                type: 'tpl',
+                tpl: '<div style="display:flex;justify-content:space-between;align-items:center;padding:0 24px;height:64px;background:#001529;color:#fff;"><div style="font-size:20px;font-weight:600;">⚙️ 天工系统</div><div style="display:flex;gap:24px;font-size:14px;"><span>👤 玉欣 PM</span><span>退出</span></div></div>'
+            },
+            aside: {
+                type: 'nav',
+                stacked: true,
+                activeKey: 'home',
+                className: 'bg-dark',
+                links: [
+                    { label: '📢 消息推送', to: 'home', icon: 'fa fa-bullhorn' },
+                    { label: '➕ 创建推送', to: 'create', icon: 'fa fa-plus-circle' },
+                    { label: '📝 消息模板', to: 'templates', icon: 'fa fa-file-text' },
+                    { label: '⚙️ 推送配置', to: 'config', icon: 'fa fa-cog' }
+                ]
+            },
+            pages: [
+                {
+                    key: 'home',
+                    type: 'page',
+                    title: '📢 消息推送管理',
+                    body: [
+                        {
+                            type: 'grid',
+                            columns: [
+                                { type: 'card', className: 'bg-blue-50', body: [{ type: 'tpl', tpl: '<div style="font-size:14px;color:#8c8c8c;">📊 今日推送</div><div style="font-size:32px;font-weight:700;color:#1890ff;">12</div><div style="font-size:12px;color:#52c41a;">↑ 15%</div>' }] },
+                                { type: 'card', className: 'bg-green-50', body: [{ type: 'tpl', tpl: '<div style="font-size:14px;color:#8c8c8c;">✅ 成功送达</div><div style="font-size:32px;font-weight:700;color:#52c41a;">1,842</div><div style="font-size:12px;color:#52c41a;">98.2%</div>' }] },
+                                { type: 'card', className: 'bg-orange-50', body: [{ type: 'tpl', tpl: '<div style="font-size:14px;color:#8c8c8c;">🏪 覆盖商家</div><div style="font-size:32px;font-weight:700;color:#fa8c16;">156</div><div style="font-size:12px;color:#8c8c8c;">160 家</div>' }] },
+                                { type: 'card', className: 'bg-red-50', body: [{ type: 'tpl', tpl: '<div style="font-size:14px;color:#8c8c8c;">⚠️ 推送失败</div><div style="font-size:32px;font-weight:700;color:#ff4d4f;">3</div><div style="font-size:12px;color:#ff4d4f;">需关注</div>' }] }
+                            ]
+                        },
+                        {
+                            type: 'crud',
+                            api: 'get:/api/push-records',
+                            filter: {
+                                type: 'form',
+                                mode: 'inline',
+                                wrapWithPanel: false,
+                                body: [
+                                    { type: 'input-text', name: 'keywords', placeholder: '搜索推送 ID/标题', addOn: { type: 'submit', label: '搜索' } },
+                                    { type: 'select', name: 'msgType', placeholder: '消息类型', clearable: true, options: [
+                                        { label: '系统通知', value: 'system' },
+                                        { label: '关店通知', value: 'close' },
+                                        { label: '注销通知', value: 'cancel' },
+                                        { label: '清退通知', value: 'remove' },
+                                        { label: '营销活动', value: 'marketing' }
+                                    ]},
+                                    { type: 'select', name: 'status', placeholder: '状态', clearable: true, options: [
+                                        { label: '发送成功', value: 'success' },
+                                        { label: '发送中', value: 'sending' },
+                                        { label: '部分失败', value: 'partial_failed' },
+                                        { label: '发送失败', value: 'failed' }
+                                    ]}
+                                ]
+                            },
+                            headerToolbar: [{ type: 'button', label: '➕ 创建推送', level: 'primary', actionType: 'link', link: 'create' }],
+                            columns: [
+                                { name: 'id', label: '推送 ID', width: 180 },
+                                { name: 'title', label: '消息标题' },
+                                { name: 'msgType', label: '类型', type: 'mapping', map: {
+                                    system: "<span class='label label-info'>系统通知</span>",
+                                    close: "<span class='label label-warning'>关店通知</span>",
+                                    cancel: "<span class='label label-purple'>注销通知</span>",
+                                    remove: "<span class='label label-danger'>清退通知</span>",
+                                    marketing: "<span class='label label-success'>营销活动</span>"
+                                }},
+                                { name: 'receiverCount', label: '接收方', type: 'tpl', tpl: '${receiverCount}家' },
+                                { name: 'sendTime', label: '发送时间', type: 'date', format: 'YYYY-MM-DD HH:mm' },
+                                { name: 'status', label: '状态', type: 'mapping', map: {
+                                    success: "<span class='label label-success'>✓ 成功</span>",
+                                    sending: "<span class='label label-info'>⏳ 发送中</span>",
+                                    partial_failed: "<span class='label label-warning'>✗ 部分失败</span>",
+                                    failed: "<span class='label label-danger'>✗ 失败</span>"
+                                }},
+                                { type: 'operation', label: '操作', width: 120, buttons: [
+                                    { type: 'button', label: '详情', level: 'link' },
+                                    { type: 'button', label: '重试', level: 'danger', visibleOn: "data.status=='failed'" }
+                                ]}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    key: 'create',
+                    type: 'page',
+                    title: '➕ 创建推送任务',
+                    body: [
+                        {
+                            type: 'steps',
+                            value: 0,
+                            steps: [
+                                { title: '选择接收方' },
+                                { title: '编辑消息内容' },
+                                { title: '预览并发送' }
+                            ]
+                        },
+                        {
+                            type: 'form',
+                            api: 'post:/api/push-tasks',
+                            mode: 'horizontal',
+                            body: [
+                                { type: 'input-select', name: 'scenario', label: '推送场景', required: true, options: [
+                                    { label: '系统通知', value: 'system' },
+                                    { label: '关店通知', value: 'close' },
+                                    { label: '注销通知', value: 'cancel' },
+                                    { label: '清退通知', value: 'remove' },
+                                    { label: '营销活动', value: 'marketing' },
+                                    { label: '自定义消息', value: 'custom' }
+                                ]},
+                                { type: 'input-tree', name: 'receivers', label: '接收方', required: true, multiple: true, source: [
+                                    { label: '按区域筛选', children: [
+                                        { label: '重庆区域（45 家）', value: 'cq' },
+                                        { label: '成都区域（38 家）', value: 'cd' },
+                                        { label: '贵州区域（32 家）', value: 'gz' }
+                                    ]},
+                                    { label: '按业务线', children: [
+                                        { label: '配件（89 家）', value: 'parts' },
+                                        { label: '新机（45 家）', value: 'new' },
+                                        { label: '套餐（26 家）', value: 'package' }
+                                    ]},
+                                    { label: '按商家', children: [
+                                        { label: '重庆 XX 商贸有限公司', value: 'm001' },
+                                        { label: '成都 XX 科技有限公司', value: 'm002' },
+                                        { label: '贵州 XX 贸易公司', value: 'm003' }
+                                    ]}
+                                ]},
+                                { type: 'input-text', name: 'title', label: '消息标题', required: true, placeholder: '【店铺清退通知】' },
+                                { type: 'textarea', name: 'content', label: '消息内容', required: true, rows: 10, value: '【店铺清退通知】\n\n尊敬的{商家名称}：\n\n因您的店铺存在违规行为，现决定对该店铺进行清退处理。\n\n清退流程：\n1. 即日起停止经营活动\n2. 3 个工作日内完成售后\n3. 7 个工作日内完成保证金结算\n\n笨鸟商城运营团队\n{日期}' },
+                                { type: 'static', label: '消息预览', tpl: '<div style="background:#f5f7fa;border:1px solid #e8e8e8;border-radius:6px;padding:16px;"><div style="background:#fff;padding:16px;border-radius:4px;"><strong>【店铺清退通知】</strong><br><br>尊敬的商家：<br><br>因您的店铺存在违规行为，现决定对该店铺进行清退处理。<br><br>清退流程：<br>1. 即日起停止经营活动<br>2. 3 个工作日内完成售后<br>3. 7 个工作日内完成保证金结算<br><br>笨鸟商城运营团队</div></div>' },
+                                { type: 'button-group', buttons: [
+                                    { type: 'submit', label: '✅ 确认发送', level: 'success' },
+                                    { type: 'button', label: '保存草稿', level: 'default' }
+                                ], align: 'right' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    key: 'templates',
+                    type: 'page',
+                    title: '📝 消息模板管理',
+                    toolbar: [{ type: 'button', label: '➕ 新建模板', level: 'primary', actionType: 'drawer', drawer: {
+                        title: '新建模板',
+                        body: { type: 'form', api: 'post:/api/templates', body: [
+                            { type: 'input-text', name: 'name', label: '模板名称', required: true },
+                            { type: 'select', name: 'scenario', label: '适用场景', options: [
+                                { label: '系统通知', value: 'system' },
+                                { label: '关店通知', value: 'close' },
+                                { label: '注销通知', value: 'cancel' },
+                                { label: '清退通知', value: 'remove' },
+                                { label: '营销活动', value: 'marketing' }
+                            ]},
+                            { type: 'textarea', name: 'content', label: '模板内容', rows: 8, required: true },
+                            { type: 'button-group', buttons: [{ type: 'submit', label: '保存', level: 'primary' }, { type: 'button', label: '取消', actionType: 'close' }] }
+                        ]}
+                    }}],
+                    body: {
+                        type: 'crud',
+                        api: 'get:/api/templates',
+                        columns: [
+                            { name: 'id', label: '模板 ID' },
+                            { name: 'name', label: '模板名称' },
+                            { name: 'scenario', label: '场景' },
+                            { name: 'variables', label: '变量' },
+                            { name: 'lastUsed', label: '最后使用', type: 'date', format: 'YYYY-MM-DD' },
+                            { type: 'operation', label: '操作', buttons: [
+                                { type: 'button', label: '编辑', level: 'link' },
+                                { type: 'button', label: '使用', level: 'link', actionType: 'link', link: 'create' }
+                            ]}
+                        ]
+                    }
+                },
+                {
+                    key: 'config',
+                    type: 'page',
+                    title: '⚙️ 推送配置',
+                    body: {
+                        type: 'form',
+                        api: 'post:/api/config',
+                        mode: 'horizontal',
+                        body: [
+                            { type: 'fieldset', title: '🔗 企业微信配置', body: [
+                                { type: 'input-text', name: 'corpId', label: '企业 ID', required: true, value: 'ww1234567890abcdef' },
+                                { type: 'input-text', name: 'agentId', label: 'AgentId', required: true, value: '1000001' },
+                                { type: 'input-password', name: 'secret', label: 'Secret', required: true, value: '******************' }
+                            ]},
+                            { type: 'fieldset', title: '📊 推送参数', body: [
+                                { type: 'input-number', name: 'batchLimit', label: '批量上限', value: 1000 },
+                                { type: 'input-number', name: 'interval', label: '发送间隔 (ms)', value: 1000 },
+                                { type: 'select', name: 'retryCount', label: '重试次数', options: [
+                                    { label: '不重试', value: 0 },
+                                    { label: '重试 1 次', value: 1 },
+                                    { label: '重试 2 次', value: 2 },
+                                    { label: '重试 3 次', value: 3 }
+                                ], value: 1 }
+                            ]},
+                            { type: 'button-group', buttons: [{ type: 'submit', label: '保存配置', level: 'primary' }], align: 'right' }
+                        ]
+                    }
+                }
+            ]
+        };
+        amis.embed('#root', app, { locale: 'zh-CN', theme: 'cxd' });
+    });
+    </script>
+</body>
+</html>

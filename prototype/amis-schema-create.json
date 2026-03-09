@@ -1,0 +1,237 @@
+{
+  "type": "page",
+  "title": "➕ 创建推送任务",
+  "remark": "三步完成消息推送配置",
+  "body": [
+    {
+      "type": "steps",
+      "value": 1,
+      "steps": [
+        {
+          "title": "选择接收方",
+          "subTitle": "Step 1"
+        },
+        {
+          "title": "编辑消息内容",
+          "subTitle": "Step 2"
+        },
+        {
+          "title": "预览并发送",
+          "subTitle": "Step 3"
+        }
+      ]
+    },
+    {
+      "type": "form",
+      "api": "post:/api/push-tasks",
+      "mode": "horizontal",
+      "horizontal": {
+        "left": 4,
+        "right": 8
+      },
+      "body": [
+        {
+          "type": "input-select",
+          "name": "scenario",
+          "label": "推送场景",
+          "required": true,
+          "placeholder": "请选择推送场景",
+          "options": [
+            { "label": "📢 系统通知（日常运营通知）", "value": "system" },
+            { "label": "🚪 关店通知（正式关店流程）", "value": "close" },
+            { "label": "📄 注销通知（注销申请通知）", "value": "cancel" },
+            { "label": "⚠️ 清退通知（违规清退通知）", "value": "remove" },
+            { "label": "🎉 营销活动（促销/活动邀请）", "value": "marketing" },
+            { "label": "📝 自定义消息", "value": "custom" }
+          ],
+          "description": "选择消息类型，不同场景对应不同的消息模板"
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "input-tree",
+          "name": "receivers",
+          "label": "接收方选择",
+          "required": true,
+          "multiple": true,
+          "checkStrictly": false,
+          "unfoldedLevel": 2,
+          "source": [
+            {
+              "label": "📍 按区域筛选",
+              "value": "region",
+              "children": [
+                { "label": "重庆区域（45 家）", "value": "cq" },
+                { "label": "成都区域（38 家）", "value": "cd" },
+                { "label": "贵州区域（32 家）", "value": "gz" },
+                { "label": "云南区域（25 家）", "value": "yn" },
+                { "label": "四川区域（20 家）", "value": "sc" }
+              ]
+            },
+            {
+              "label": "📦 按业务线筛选",
+              "value": "business",
+              "children": [
+                { "label": "配件（89 家）", "value": "parts" },
+                { "label": "新机（45 家）", "value": "new" },
+                { "label": "套餐（26 家）", "value": "package" }
+              ]
+            },
+            {
+              "label": "🏪 按店铺类型",
+              "value": "shopType",
+              "children": [
+                { "label": "旗舰店（32 家）", "value": "flagship" },
+                { "label": "专卖店（78 家）", "value": "specialty" },
+                { "label": "普通店（50 家）", "value": "normal" }
+              ]
+            },
+            {
+              "label": "📋 按商家选择",
+              "value": "merchant",
+              "children": [
+                { "label": "重庆 XX 商贸有限公司", "value": "merchant_001", "disabled": false },
+                { "label": "成都 XX 科技有限公司", "value": "merchant_002", "disabled": false },
+                { "label": "贵州 XX 贸易公司", "value": "merchant_003", "disabled": false },
+                { "label": "云南 XX 供应链公司", "value": "merchant_004", "disabled": true },
+                { "label": "四川 XX 电器服务商", "value": "merchant_005", "disabled": false }
+              ]
+            }
+          ],
+          "description": "已选 ${receivers|length} 家商家 | 仅显示已对接企业微信的商家"
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "input-text",
+          "name": "title",
+          "label": "消息标题",
+          "required": true,
+          "placeholder": "请输入消息标题，如：【店铺清退通知】",
+          "addOn": {
+            "type": "button",
+            "label": "从模板选择",
+            "actionType": "drawer",
+            "drawer": {
+              "title": "选择消息模板",
+              "body": {
+                "type": "crud",
+                "api": "get:/api/templates",
+                "columns": [
+                  { "name": "name", "label": "模板名称" },
+                  { "name": "scenario", "label": "适用场景" },
+                  {
+                    "type": "operation",
+                    "label": "操作",
+                    "buttons": [
+                      {
+                        "type": "button",
+                        "label": "使用此模板",
+                        "level": "link",
+                        "actionType": "custom",
+                        "script": "alert('使用模板：' + data.name)"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "type": "textarea",
+          "name": "content",
+          "label": "消息内容",
+          "required": true,
+          "rows": 12,
+          "value": "【店铺清退通知】\n\n尊敬的{商家名称}：\n\n因您的店铺 {店铺名称} 存在严重违规行为（售假/刷单/恶意投诉），根据平台《商家管理规范》第 X 章第 X 条规定，现决定对该店铺进行清退处理。\n\n清退流程：\n1. 即日起停止店铺所有经营活动\n2. 3 个工作日内完成订单售后处理\n3. 7 个工作日内完成保证金结算\n4. 店铺账号将于 2026-03-XX 正式关闭\n\n如有疑问，请联系运营负责人。\n\n笨鸟商城运营团队\n{日期}",
+          "description": "支持变量：{商家名称} {店铺名称} {日期} {联系人} {订单号} {申请编号}"
+        },
+        {
+          "type": "group",
+          "body": [
+            {
+              "type": "input-datetime",
+              "name": "scheduleTime",
+              "label": "定时发送",
+              "placeholder": "不设置则立即发送",
+              "description": "留空表示立即发送"
+            },
+            {
+              "type": "select",
+              "name": "priority",
+              "label": "消息优先级",
+              "value": "normal",
+              "options": [
+                { "label": "🟢 普通（正常队列）", "value": "normal" },
+                { "label": "🟡 高（优先发送）", "value": "high" },
+                { "label": "🔴 紧急（立即发送 + 短信提醒）", "value": "urgent" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "static",
+          "label": "消息预览",
+          "tpl": "<div style='background:#f5f7fa;border:1px solid #e8e8e8;border-radius:6px;padding:16px;'><div style='background:#fff;padding:16px;border-radius:4px;border:1px solid #d9d9d9;'><div style='font-size:12px;color:#8c8c8c;border-bottom:1px solid #f0f0f0;padding-bottom:8px;margin-bottom:12px;'>企业微信 · 工作通知</div><div style='line-height:1.8;'><strong>【店铺清退通知】</strong><br><br>尊敬的重庆 XX 商贸有限公司：<br><br>因您的店铺 XX 旗舰店存在严重违规行为（售假/刷单/恶意投诉），根据平台《商家管理规范》第 X 章第 X 条规定，现决定对该店铺进行清退处理。<br><br><strong>清退流程：</strong><br>1. 即日起停止店铺所有经营活动<br>2. 3 个工作日内完成订单售后处理<br>3. 7 个工作日内完成保证金结算<br>4. 店铺账号将于 2026-03-XX 正式关闭<br><br>如有疑问，请联系运营负责人。<br><br>笨鸟商城运营团队<br>2026-03-09</div></div></div>"
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "button-group",
+          "buttons": [
+            {
+              "type": "submit",
+              "label": "✅ 确认发送",
+              "level": "success",
+              "size": "lg"
+            },
+            {
+              "type": "button",
+              "label": "💾 保存草稿",
+              "level": "default",
+              "size": "lg",
+              "actionType": "ajax",
+              "api": "post:/api/push-tasks/draft"
+            },
+            {
+              "type": "button",
+              "label": "🧪 预览测试",
+              "level": "default",
+              "size": "lg",
+              "actionType": "drawer",
+              "drawer": {
+                "title": "测试发送",
+                "body": {
+                  "type": "form",
+                  "body": [
+                    {
+                      "type": "input-text",
+                      "name": "testReceiver",
+                      "label": "测试接收人",
+                      "placeholder": "输入企业微信账号"
+                    },
+                    {
+                      "type": "button",
+                      "label": "发送测试",
+                      "level": "primary",
+                      "actionType": "ajax",
+                      "api": "post:/api/push-tasks/test"
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "align": "right"
+        }
+      ]
+    }
+  ]
+}

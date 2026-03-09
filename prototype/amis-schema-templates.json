@@ -1,0 +1,209 @@
+{
+  "type": "page",
+  "title": "📝 消息模板管理",
+  "remark": "保存常用消息模板，提高推送效率",
+  "toolbar": [
+    {
+      "type": "button",
+      "label": "➕ 新建模板",
+      "level": "primary",
+      "icon": "fa fa-plus",
+      "actionType": "drawer",
+      "drawer": {
+        "title": "新建消息模板",
+        "width": "LG",
+        "body": {
+          "type": "form",
+          "api": "post:/api/templates",
+          "mode": "horizontal",
+          "horizontal": {
+            "left": 4,
+            "right": 8
+          },
+          "body": [
+            {
+              "type": "input-text",
+              "name": "name",
+              "label": "模板名称",
+              "required": true,
+              "placeholder": "如：店铺清退通知（标准版）"
+            },
+            {
+              "type": "select",
+              "name": "scenario",
+              "label": "适用场景",
+              "required": true,
+              "options": [
+                { "label": "📢 系统通知", "value": "system" },
+                { "label": "🚪 关店通知", "value": "close" },
+                { "label": "📄 注销通知", "value": "cancel" },
+                { "label": "⚠️ 清退通知", "value": "remove" },
+                { "label": "🎉 营销活动", "value": "marketing" }
+              ]
+            },
+            {
+              "type": "textarea",
+              "name": "content",
+              "label": "模板内容",
+              "required": true,
+              "rows": 10,
+              "placeholder": "请输入模板内容，支持变量：{商家名称} {日期} 等"
+            },
+            {
+              "type": "input-text",
+              "name": "variables",
+              "label": "变量说明",
+              "placeholder": "如：{商家名称} {店铺名称} {日期}"
+            },
+            {
+              "type": "button-group",
+              "buttons": [
+                {
+                  "type": "submit",
+                  "label": "保存",
+                  "level": "primary"
+                },
+                {
+                  "type": "button",
+                  "label": "取消",
+                  "level": "default",
+                  "actionType": "close"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "body": [
+    {
+      "type": "crud",
+      "api": "get:/api/templates",
+      "filter": {
+        "type": "form",
+        "mode": "inline",
+        "wrapWithPanel": false,
+        "body": [
+          {
+            "type": "input-text",
+            "name": "keywords",
+            "placeholder": "搜索模板名称",
+            "clearable": true,
+            "addOn": {
+              "type": "submit",
+              "label": "搜索"
+            }
+          },
+          {
+            "type": "select",
+            "name": "scenario",
+            "placeholder": "适用场景",
+            "clearable": true,
+            "options": [
+              { "label": "系统通知", "value": "system" },
+              { "label": "关店通知", "value": "close" },
+              { "label": "注销通知", "value": "cancel" },
+              { "label": "清退通知", "value": "remove" },
+              { "label": "营销活动", "value": "marketing" }
+            ]
+          }
+        ]
+      },
+      "columns": [
+        {
+          "name": "id",
+          "label": "模板 ID",
+          "width": 120
+        },
+        {
+          "name": "name",
+          "label": "模板名称",
+          "type": "tpl",
+          "tpl": "<strong>${name}</strong>"
+        },
+        {
+          "name": "scenario",
+          "label": "适用场景",
+          "type": "mapping",
+          "map": {
+            "system": "<span class='label label-info'>系统通知</span>",
+            "close": "<span class='label label-warning'>关店通知</span>",
+            "cancel": "<span class='label label-purple'>注销通知</span>",
+            "remove": "<span class='label label-danger'>清退通知</span>",
+            "marketing": "<span class='label label-success'>营销活动</span>"
+          }
+        },
+        {
+          "name": "variables",
+          "label": "变量",
+          "type": "tpl",
+          "tpl": "<code>${variables}</code>"
+        },
+        {
+          "name": "lastUsed",
+          "label": "最后使用",
+          "type": "date",
+          "format": "YYYY-MM-DD"
+        },
+        {
+          "name": "creator",
+          "label": "创建人"
+        },
+        {
+          "type": "operation",
+          "label": "操作",
+          "width": 180,
+          "buttons": [
+            {
+              "type": "button",
+              "label": "编辑",
+              "level": "link",
+              "actionType": "drawer",
+              "drawer": {
+                "title": "编辑模板 - ${name}",
+                "body": {
+                  "type": "form",
+                  "api": "put:/api/templates/${id}",
+                  "body": [
+                    { "type": "input-text", "name": "name", "label": "模板名称", "required": true },
+                    { 
+                      "type": "select", 
+                      "name": "scenario", 
+                      "label": "适用场景", 
+                      "options": [
+                        { "label": "系统通知", "value": "system" },
+                        { "label": "关店通知", "value": "close" },
+                        { "label": "注销通知", "value": "cancel" },
+                        { "label": "清退通知", "value": "remove" },
+                        { "label": "营销活动", "value": "marketing" }
+                      ]
+                    },
+                    { "type": "textarea", "name": "content", "label": "模板内容", "rows": 10, "required": true },
+                    { "type": "input-text", "name": "variables", "label": "变量说明" }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "button",
+              "label": "使用",
+              "level": "link",
+              "actionType": "link",
+              "link": "/create?templateId=${id}"
+            },
+            {
+              "type": "button",
+              "label": "删除",
+              "level": "danger",
+              "actionType": "ajax",
+              "api": "delete:/api/templates/${id}",
+              "confirmText": "确定要删除这个模板吗？"
+            }
+          ]
+        }
+      ],
+      "perPage": 20
+    }
+  ]
+}

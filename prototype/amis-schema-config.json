@@ -1,0 +1,186 @@
+{
+  "type": "page",
+  "title": "⚙️ 推送配置",
+  "remark": "企业微信对接配置与推送参数设置",
+  "body": [
+    {
+      "type": "form",
+      "api": "post:/api/config",
+      "mode": "horizontal",
+      "horizontal": {
+        "left": 5,
+        "right": 7
+      },
+      "body": [
+        {
+          "type": "fieldset",
+          "title": "🔗 企业微信应用配置",
+          "body": [
+            {
+              "type": "input-text",
+              "name": "corpId",
+              "label": "企业 ID（Corp ID）",
+              "required": true,
+              "value": "ww1234567890abcdef",
+              "description": "企业微信管理后台 → 我的企业 → 企业信息"
+            },
+            {
+              "type": "group",
+              "body": [
+                {
+                  "type": "input-text",
+                  "name": "agentId",
+                  "label": "应用 AgentId",
+                  "required": true,
+                  "value": "1000001",
+                  "description": "应用管理 → 自建应用 → 查看"
+                },
+                {
+                  "type": "input-password",
+                  "name": "secret",
+                  "label": "应用 Secret",
+                  "required": true,
+                  "value": "******************",
+                  "description": "应用管理 → 自建应用 → 查看"
+                }
+              ]
+            },
+            {
+              "type": "input-text",
+              "name": "callbackUrl",
+              "label": "Token 验证 URL",
+              "value": "https://tiankong.beniao.com/wechat/callback",
+              "description": "用于接收消息送达状态回调"
+            },
+            {
+              "type": "button-group",
+              "buttons": [
+                {
+                  "type": "button",
+                  "label": "测试连接",
+                  "level": "default",
+                  "actionType": "ajax",
+                  "api": "post:/api/config/test",
+                  "feedback": {
+                    "title": "测试结果",
+                    "body": {
+                      "type": "tpl",
+                      "tpl": "<div style='padding:20px;text-align:center;'><span style='font-size:48px;color:#52c41a;'>✓</span><div style='margin-top:16px;font-size:16px;'>企业微信连接成功！</div></div>"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "fieldset",
+          "title": "📊 推送参数设置",
+          "body": [
+            {
+              "type": "group",
+              "body": [
+                {
+                  "type": "input-number",
+                  "name": "batchLimit",
+                  "label": "单次批量发送上限",
+                  "value": 1000,
+                  "min": 1,
+                  "max": 10000,
+                  "description": "避免触发企业微信 API 限流"
+                },
+                {
+                  "type": "input-number",
+                  "name": "interval",
+                  "label": "发送间隔（毫秒）",
+                  "value": 1000,
+                  "min": 100,
+                  "max": 10000,
+                  "description": "每批消息之间的间隔时间"
+                }
+              ]
+            },
+            {
+              "type": "select",
+              "name": "retryCount",
+              "label": "失败重试次数",
+              "value": 1,
+              "options": [
+                { "label": "不重试", "value": 0 },
+                { "label": "重试 1 次", "value": 1 },
+                { "label": "重试 2 次", "value": 2 },
+                { "label": "重试 3 次", "value": 3 }
+              ],
+              "description": "推送失败后自动重试次数"
+            },
+            {
+              "type": "switch",
+              "name": "enableLog",
+              "label": "启用推送日志",
+              "value": true,
+              "description": "记录每次推送的详细信息"
+            },
+            {
+              "type": "switch",
+              "name": "enableNotify",
+              "label": "失败通知",
+              "value": true,
+              "description": "推送失败时通知管理员"
+            }
+          ]
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "fieldset",
+          "title": "📧 消息模板默认设置",
+          "body": [
+            {
+              "type": "input-text",
+              "name": "defaultSender",
+              "label": "默认发送人",
+              "value": "笨鸟商城运营团队",
+              "placeholder": "消息落款显示的名称"
+            },
+            {
+              "type": "select",
+              "name": "defaultPriority",
+              "label": "默认优先级",
+              "value": "normal",
+              "options": [
+                { "label": "普通", "value": "normal" },
+                { "label": "高", "value": "high" },
+                { "label": "紧急", "value": "urgent" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "button-group",
+          "buttons": [
+            {
+              "type": "submit",
+              "label": "💾 保存配置",
+              "level": "primary",
+              "size": "lg"
+            },
+            {
+              "type": "button",
+              "label": "🔄 恢复默认",
+              "level": "default",
+              "size": "lg",
+              "actionType": "ajax",
+              "api": "post:/api/config/reset",
+              "confirmText": "确定要恢复默认配置吗？"
+            }
+          ],
+          "align": "right"
+        }
+      ]
+    }
+  ]
+}
