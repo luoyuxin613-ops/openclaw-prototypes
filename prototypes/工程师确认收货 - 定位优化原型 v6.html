@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工程师确认收货 - 定位优化原型 v5</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 375px; margin: 0 auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 20px; text-align: center; }
+        .header h1 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .header .order-no { font-size: 12px; opacity: 0.9; }
+        .section { padding: 16px 20px; border-bottom: 1px solid #f0f0f0; }
+        .section-title { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+        .section-title .icon { width: 20px; height: 20px; background: #667eea; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .info-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 14px; }
+        .info-label { color: #666; }
+        .info-value { color: #333; font-weight: 500; }
+        .info-value.highlight { color: #667eea; font-weight: 600; }
+        .info-value.warning { color: #faad14; font-weight: 600; }
+        .info-value.success { color: #52c41a; font-weight: 600; }
+        .pickup-code { background: #f9f9f9; border: 2px dashed #667eea; border-radius: 8px; padding: 16px; text-align: center; margin: 12px 0; }
+        .pickup-code .code { font-size: 32px; font-weight: 700; color: #667eea; letter-spacing: 4px; font-family: monospace; }
+        .pickup-code .label { font-size: 12px; color: #999; margin-top: 4px; }
+        .location-box { background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%); border-radius: 8px; padding: 12px; margin: 12px 0; }
+        .location-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; }
+        .location-row:first-child { border-bottom: 1px solid #d0d0d0; padding-bottom: 8px; margin-bottom: 8px; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #52c41a; display: inline-block; margin-right: 4px; }
+        .status-dot.warning { background: #faad14; }
+        .refresh-btn { background: #667eea; color: #fff; border: none; border-radius: 4px; padding: 4px 12px; font-size: 12px; cursor: pointer; }
+        .refresh-btn:hover { background: #5568d3; }
+        .distance-badge { background: #52c41a; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+        .distance-badge.warning { background: #faad14; }
+        .notes-box { background: #f0f5ff; border: 1px solid #adc6ff; border-radius: 8px; padding: 12px; margin: 12px 0; }
+        .notes-title { font-size: 13px; font-weight: 600; color: #2f54eb; margin-bottom: 8px; }
+        .notes-list { list-style: none; font-size: 12px; color: #666; }
+        .notes-list li { padding: 4px 0; padding-left: 16px; position: relative; }
+        .notes-list li::before { content: "•"; position: absolute; left: 4px; color: #2f54eb; }
+        .action-buttons { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
+        .btn-secondary { background: #fff; color: #667eea; border: 2px solid #667eea; }
+        .btn-danger { background: #fff; color: #f5222d; border: 2px solid #f5222d; }
+        .toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px; display: none; z-index: 1000; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: #fff; border-radius: 12px; max-width: 340px; width: 90%; overflow: hidden; }
+        .modal-header { padding: 16px 20px; border-bottom: 1px solid #f0f0f0; font-size: 16px; font-weight: 600; }
+        .modal-body { padding: 20px; font-size: 14px; color: #666; }
+        .modal-footer { padding: 16px 20px; display: flex; gap: 12px; }
+        .modal-footer .btn { flex: 1; padding: 12px; font-size: 14px; }
+        .tag { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+        .tag-warning { background: #fff7e6; color: #d48806; border: 1px solid #ffd591; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📦 确认收货</h1>
+            <div class="order-no">订单号：DD20260310001234</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">📋</span>订单信息</div>
+            <div class="info-row"><span class="info-label">商品名称</span><span class="info-value">空调压缩机（适用格力/美的）</span></div>
+            <div class="info-row"><span class="info-label">SKU 编码</span><span class="info-value highlight">SKU-20260310-001</span></div>
+            <div class="info-row"><span class="info-label">数量</span><span class="info-value">1 件</span></div>
+            <div class="info-row"><span class="info-label">下单时间</span><span class="info-value">2026-03-10 14:30</span></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">🔢</span>取货码</div>
+            <div class="pickup-code">
+                <div class="code">8 8 6 5 2 1</div>
+                <div class="label">向商家出示此取货码</div>
+            </div>
+            <div class="info-row"><span class="info-label">有效期</span><span class="info-value warning">⏰ 剩余 23 小时 52 分钟</span></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">🏪</span>商家信息</div>
+            <div class="info-row"><span class="info-label">商家名称</span><span class="info-value">广州配件批发商</span></div>
+            <div class="info-row"><span class="info-label">联系电话</span><span class="info-value highlight">📞 138****5678</span></div>
+            <div class="info-row"><span class="info-label">取货地址</span><span class="info-value">广州市天河区 XX 路 XX 号</span></div>
+            <div class="info-row"><span class="info-label">营业时间</span><span class="info-value">09:00 - 18:00</span></div>
+        </div>
+
+        <div class="section" style="background: #f9f9f9;">
+            <div class="section-title"><span class="icon">📍</span>定位信息</div>
+            <div class="location-box">
+                <div class="location-row">
+                    <span class="info-label">🛰️ 定位状态</span>
+                    <span><span class="status-dot" id="statusDot"></span><span class="info-value success" id="statusText">定位正常</span></span>
+                </div>
+                <div class="location-row"><span class="info-label">📍 当前位置</span><span class="info-value">广州市天河区 XX 路 123 号</span></div>
+                <div class="location-row"><span class="info-label">📏 距离商家</span><span class="distance-badge" id="distanceBadge">✅ 85 米</span></div>
+                <div class="location-row"><span class="info-label">🕐 定位时间</span><span class="info-value" id="locationTime">19:36:00</span></div>
+                <div class="location-row" style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #d0d0d0;">
+                    <span class="info-label">🔄 定位刷新</span>
+                    <button class="refresh-btn" onclick="refreshLocation()">🔄 刷新定位</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">📝</span>注意事项</div>
+            <div class="notes-box">
+                <div class="notes-title">ℹ️ 注意事项</div>
+                <ul class="notes-list">
+                    <li>需在店铺 500m 范围内正常确认收货，超过 500 米订单会记录距离异常，仍可以确认收货</li>
+                    <li>如定位不准确，请点击手动刷新定位</li>
+                    <li>拍照需包含商家取货环境，店铺门头照</li>
+                    <li>确认收货后，配件将计入您的库存</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-primary" id="confirmBtn" onclick="confirmReceipt()">✅ 确认收货</button>
+            <button class="btn btn-danger" onclick="reportException()">⚠️ 报异常</button>
+            <button class="btn btn-secondary" onclick="contactMerchant()">📞 继续核销</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header">⚠️ 距离异常确认</div>
+            <div class="modal-body">
+                <p>您当前距离商家 <strong id="confirmDistance">850</strong> 米，超出正常范围（500 米）。</p>
+                <br>
+                <p>如确实在商家处取货，可继续确认收货，系统将：</p>
+                <br>
+                <div style="background:#f9f9f9;padding:12px;border-radius:4px;">
+                    <div style="font-size:13px;color:#666;">
+                        • 标记订单为【距离异常】<br>
+                        • 可能触发人工审核<br>
+                        • 请确保取货真实性
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('confirmModal')">取消</button>
+                <button class="btn btn-primary" onclick="forceConfirm()">仍要确认收货</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #52c41a; color: #fff;">✅ 确认收货成功</div>
+            <div class="modal-body">
+                <p>商品已确认收货，配件已计入您的口袋仓。</p>
+                <br>
+                <div style="background: #f9f9f9; padding: 12px; border-radius: 4px;">
+                    <div class="info-row"><span class="info-label">口袋仓余额</span><span class="info-value highlight">¥4,850 / ¥5,000</span></div>
+                    <div class="info-row"><span class="info-label">预计核销时间</span><span class="info-value">2026-03-17 前</span></div>
+                    <div class="info-row" id="tagRow" style="display:none;"><span class="info-label">订单标签</span><span class="tag tag-warning">⚠️ 距离异常</span></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('successModal')">完成</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDistance = 85;
+        function refreshLocation() {
+            showToast('🔄 正在刷新定位...');
+            setTimeout(() => {
+                currentDistance = Math.floor(Math.random() * 1500) + 50;
+                updateLocationDisplay();
+                showToast('✅ 定位已更新');
+            }, 1000);
+        }
+        function updateLocationDisplay() {
+            const badge = document.getElementById('distanceBadge');
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const timeEl = document.getElementById('locationTime');
+            const now = new Date();
+            timeEl.textContent = now.toLocaleTimeString('zh-CN', {hour12: false});
+            document.getElementById('confirmDistance').innerHTML = currentDistance;
+            if (currentDistance <= 500) {
+                badge.className = 'distance-badge';
+                badge.innerHTML = '✅ ' + currentDistance + '米';
+                statusDot.className = 'status-dot';
+                statusText.className = 'info-value success';
+                statusText.innerHTML = '定位正常';
+                document.getElementById('confirmBtn').innerHTML = '✅ 确认收货';
+            } else {
+                badge.className = 'distance-badge warning';
+                badge.innerHTML = '⚠️ ' + currentDistance + '米';
+                statusDot.className = 'status-dot warning';
+                statusText.className = 'info-value warning';
+                statusText.innerHTML = '距离超限';
+                document.getElementById('confirmBtn').innerHTML = '⚠️ 仍要确认收货';
+            }
+        }
+        function confirmReceipt() {
+            if (currentDistance > 500) {
+                document.getElementById('confirmModal').style.display = 'flex';
+            } else {
+                showSuccessModal();
+            }
+        }
+        function forceConfirm() {
+            closeModal('confirmModal');
+            showSuccessModal();
+        }
+        function reportException() { showToast('⚠️ 异常上报功能开发中'); }
+        function contactMerchant() { showToast('📞 正在拨打商家电话...'); }
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerHTML = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2000);
+        }
+        function showSuccessModal() {
+            if (currentDistance > 500) {
+                document.getElementById('tagRow').style.display = 'flex';
+            } else {
+                document.getElementById('tagRow').style.display = 'none';
+            }
+            document.getElementById('successModal').style.display = 'flex';
+        }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') { event.target.style.display = 'none'; }
+        }
+    </script>
+</body>
+</html>
