@@ -22,6 +22,11 @@
 - **只记重要的**：日常聊天、闲聊、测试指令不记录。
   - 只记录与工作、项目、产品、个人成长相关的实质内容。
   - 超过 3 个月的非关键记忆自动归档或删除（保持记忆轻量）。
+- **Self-improving**：`~/self-improving/`（通过 `self-improving` 技能）— 执行改进记忆（偏好、工作流、风格模式、改进/恶化结果的经验）
+  - 使用 `memory/YYYY-MM-DD.md` 和 `MEMORY.md` 存储事实性上下文（事件、决策）
+  - 使用 `~/self-improving/` 存储可复用的执行质量改进经验
+  - 非平凡任务前：读取 `~/self-improving/memory.md` + 最多 3 个相关的 `domains/` 或 `projects/` 文件
+  - 纠正/可复用经验 → 立即写入 `~/self-improving/corrections.md` 或对应文件
 - 用户可随时说"更新记忆"或"删除某条记忆"，立即执行。
 
 ## 群聊规则（如果被拉进群组）
